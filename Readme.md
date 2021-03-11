@@ -1,10 +1,12 @@
-# RevealJS drawer plugin (4.5KB gzipped)
+# RevealJS drawer plugin (3.2KB gzipped)
 
-Changes your mouse into a pointer when necessary. [Demo](https://burnpiro.github.io/presentation-template/#/) ("q", `18px`, `red`).
+Allows you to draw over your slides. Drawings are saved per slide and kept when slide is changed. [Demo](https://burnpiro.github.io/presentation-template/#/2). Works with [RevealJS Pointer Plugin](https://github.com/burnpiro/reveal-pointer).
 
 > This plugin only works with [RevealJS](https://revealjs.com/) `v4.x` or higher.
 
-No external dependencies, __only 7.5KB  | <4.5KB gzipped__.
+No external dependencies, __only 7.5KB  | <3.2KB gzipped__.
+
+![](./example-drawer.png)
 
 ## Installation
 
