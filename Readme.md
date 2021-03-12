@@ -32,6 +32,30 @@ Add `RevealDrawer` into your plugins initialization:
 plugins: [RevealDrawer];
 ```
 
+### Usage
+
+#### Keybindings (default):
+
+- `T` - toggle drawing board
+- `D` - toggle mode (`drawing` or `not drawing`)
+- `Ctrl + Z` - remove last line from current slide
+- `"1", "2", "3", "4"` - change selected color (base on the order)
+
+If you're not changing anything in the [Config](#config) then you should be able to show drawing board just by hitting `T`. By default the drawing is enabled. 
+
+![](enabled.png)
+
+If you hit `D` then drawing mode is toggled and it is going to switch to `disabled` mode (the pen icon is grayed out).
+
+![](disabled.png)
+
+In drawing mode you're not able to interact with other elements (like code) because it would disturb your drawing. That's why switching between drawing and not drawing mode is important.
+
+Each time you draw sth, it is saved for this particular slide (slide includes all fragments). You can switch between slides and have a different drawing on each one. `Ctrl + Z` is available if you make a mistake in your drawing. It also works per slide even if you're coming back from the different slide.
+
+You're able to change between colors using color icons or numbers on the keyboard. Each color has a number assigned to it and if you have 4 colors then numbers `1,2,3,4` on your keyboard are responsible for switching between them (default option). If you change default colors then numbers are assigned to new ones (base on how many colors you have). E.g. you've decided to have simpler colors, so your list looks like `['#FF0000', '#00FF00', '#0000FF']`, now only `1,2,3` keys are available. 
+
+
 ### Config
 
 You can configure drawer key and tail length in plugin config.
