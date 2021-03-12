@@ -202,12 +202,21 @@ const Drawer = () => {
     }
   }
 
+  function changeColorManually(e) {
+    const colorKeys = options.colors.map((color, idx) => String(idx+1))
+    if(colorKeys.includes(e.key)) {
+      colorsBoard.selectColor(options.colors[Number(e.key)-1])
+    }
+  }
+
   function registerKeys() {
     document.addEventListener('keydown', removeLastPath)
+    document.addEventListener('keydown', changeColorManually)
   }
 
   function unregisterKeys() {
     document.removeEventListener('keydown', removeLastPath)
+    document.removeEventListener('keydown', changeColorManually)
   }
 
   function toggleBoardVisibility() {
