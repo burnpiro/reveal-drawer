@@ -1,6 +1,6 @@
 {
   "name": "reveal.js-drawer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Drawing Board for RevealJS presentations",
   "main": "dist/drawer.js",
   "scripts": {
