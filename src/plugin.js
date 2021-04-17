@@ -18,6 +18,7 @@ const Drawer = () => {
   let drawerElementContext = null;
   let drawerContainerElement = null;
   let colorsBoard = null;
+  let eventDispatcher = null;
   let currentBoard = {
     drawerElement: null,
     drawerElementContext: null,
@@ -49,10 +50,7 @@ const Drawer = () => {
     } else {
       options.toggleBoardKey = options.toggleBoardKey.toLowerCase();
     }
-    if (
-      options.pathSize == null ||
-      typeof options.pathSize !== "number"
-    ) {
+    if (options.pathSize == null || typeof options.pathSize !== "number") {
       options.pathSize = 12;
     }
     if (!Array.isArray(options.colors) || options.colors.length === 0) {
@@ -71,26 +69,29 @@ const Drawer = () => {
     mouse.prevX = mouse.x;
     mouse.prevY = mouse.y;
     if (currentBoard.paths.length === 0) {
-      return false
+      return false;
     }
-    const currentPath = currentBoard.paths[currentBoard.paths.length - 1]
+    const currentPath = currentBoard.paths[currentBoard.paths.length - 1];
     currentBoard.drawerElementContext.fillStyle = currentPath.color;
     currentBoard.drawerElementContext.strokeStyle = currentPath.color;
     currentBoard.drawerElementContext.lineWidth = currentPath.pathSize;
     // drawerElementContext.clearRect( 0, 0, drawerElement.width, drawerElement.height );
     // draw the single path
-    currentBoard.drawerElementContext.stroke(
-      currentPath
-    );
+    currentBoard.drawerElementContext.stroke(currentPath);
   }
 
   function redraw() {
-    currentBoard.drawerElementContext.clearRect( 0, 0, currentBoard.drawerElement.width, currentBoard.drawerElement.height );
+    currentBoard.drawerElementContext.clearRect(
+      0,
+      0,
+      currentBoard.drawerElement.width,
+      currentBoard.drawerElement.height
+    );
     for (const pathPath of currentBoard.paths) {
       currentBoard.drawerElementContext.fillStyle = pathPath.color;
       currentBoard.drawerElementContext.strokeStyle = pathPath.color;
       currentBoard.drawerElementContext.lineWidth = pathPath.pathSize;
-      currentBoard.drawerElementContext.stroke(pathPath)
+      currentBoard.drawerElementContext.stroke(pathPath);
     }
   }
 
@@ -113,8 +114,9 @@ const Drawer = () => {
   function disableDrawing(event) {
     draw();
     currentBoard.paths.push(new Path2D());
-    currentBoard.paths[currentBoard.paths.length - 1].color = options.color
-    currentBoard.paths[currentBoard.paths.length - 1].pathSize = options.pathSize
+    currentBoard.paths[currentBoard.paths.length - 1].color = options.color;
+    currentBoard.paths[currentBoard.paths.length - 1].pathSize =
+      options.pathSize;
   }
 
   function registerCursor() {
@@ -156,15 +158,24 @@ const Drawer = () => {
       currentBoard.drawerElement.style.display = "none";
     }
     currentBoard = boards[slideId];
-    disableDrawing()
+    disableDrawing();
   }
 
   const changeColor = (newColor) => {
     options.color = newColor;
-    disableDrawing()
+    if (eventDispatcher != null) {
+      eventDispatcher({
+        type: "pointerColorChange",
+        data: {
+          color: newColor
+        },
+      });
+    }
+    disableDrawing();
   };
 
-  function initCanvasContainer() {
+  function initCanvasContainer(deck) {
+    eventDispatcher = deck.dispatchEvent;
     drawerContainerElement = (function () {
       const n = document.createElement("div");
       n.className = "revealjs-drawer";
@@ -194,29 +205,29 @@ const Drawer = () => {
   }
 
   function removeLastPath(e) {
-    if(e.ctrlKey && e.key === 'z') {
+    if (e.ctrlKey && e.key === "z") {
       const currPath = currentBoard.paths.pop();
       currentBoard.paths.pop();
-      currentBoard.paths.push(currPath)
+      currentBoard.paths.push(currPath);
       requestAnimationFrame(redraw);
     }
   }
 
   function changeColorManually(e) {
-    const colorKeys = options.colors.map((color, idx) => String(idx+1))
-    if(colorKeys.includes(e.key)) {
-      colorsBoard.selectColor(options.colors[Number(e.key)-1])
+    const colorKeys = options.colors.map((color, idx) => String(idx + 1));
+    if (colorKeys.includes(e.key)) {
+      colorsBoard.selectColor(options.colors[Number(e.key) - 1]);
     }
   }
 
   function registerKeys() {
-    document.addEventListener('keydown', removeLastPath)
-    document.addEventListener('keydown', changeColorManually)
+    document.addEventListener("keydown", removeLastPath);
+    document.addEventListener("keydown", changeColorManually);
   }
 
   function unregisterKeys() {
-    document.removeEventListener('keydown', removeLastPath)
-    document.removeEventListener('keydown', changeColorManually)
+    document.removeEventListener("keydown", removeLastPath);
+    document.removeEventListener("keydown", changeColorManually);
   }
 
   function toggleBoardVisibility() {
@@ -227,10 +238,26 @@ const Drawer = () => {
       registerKeys();
       registerCursor();
       isBoardVisible = true;
+      if (eventDispatcher != null) {
+        eventDispatcher({
+          type: "pointerColorChange",
+          data: {
+            color: options.color
+          },
+        });
+      }
     } else {
       unregisterKeys();
       unregisterEventListener();
       isBoardVisible = false;
+      if (eventDispatcher != null) {
+        eventDispatcher({
+          type: "pointerColorChange",
+          data: {
+            color: null
+          },
+        });
+      }
     }
   }
 
@@ -250,7 +277,7 @@ const Drawer = () => {
     id: "drawer",
     init: (deck) => {
       initOptions(deck.getConfig());
-      initCanvasContainer();
+      initCanvasContainer(deck);
       Reveal.on("slidetransitionend", (event) => {
         const slideId = `slide-${event.indexh}-${event.indexv}`;
         if (boards[slideId]) {
