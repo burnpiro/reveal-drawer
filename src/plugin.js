@@ -65,6 +65,7 @@ const Drawer = () => {
   }
 
   function draw() {
+
     mouse.dirty = false;
     mouse.prevX = mouse.x;
     mouse.prevY = mouse.y;
@@ -96,16 +97,31 @@ const Drawer = () => {
   }
 
   function trackCursor(event) {
-    if (event.buttons === 1) {
+    if (event.buttons === 1 || event.type === "touchmove") {
       const rect = currentBoard.drawerElement.getBoundingClientRect();
-      currentBoard.paths[currentBoard.paths.length - 1].lineTo(
-        event.clientX - rect.left,
-        event.clientY - rect.top
-      );
+      if (event.type === "touchmove") {
+        currentBoard.paths[currentBoard.paths.length - 1].lineTo(
+          event.touches[0].clientX - rect.left,
+          event.touches[0].clientY - rect.top
+        );
+      } else {
+        currentBoard.paths[currentBoard.paths.length - 1].lineTo(
+          event.clientX - rect.left,
+          event.clientY - rect.top
+        );
+      }
+
     }
-    mouse.x = event.pageX;
-    mouse.y = event.pageY;
-    if (!mouse.dirty && isBoardVisible && event.buttons === 1) {
+
+    if (event.type === "touchmove") {
+      mouse.x = event.touches[0].pageX;
+      mouse.y = event.touches[0].pageY;
+    } else {
+      mouse.x = event.pageX;
+      mouse.y = event.pageY;
+    }
+
+    if (!mouse.dirty && isBoardVisible && ( event.buttons === 1 || event.type === "touchmove") ) {
       mouse.dirty = true;
       requestAnimationFrame(draw);
     }
@@ -122,6 +138,8 @@ const Drawer = () => {
   function registerCursor() {
     cursorListener = document.addEventListener("mousemove", trackCursor);
     mouseupListener = document.addEventListener("mouseup", disableDrawing);
+    cursorListener = document.addEventListener("touchmove", trackCursor);
+    mouseupListener = document.addEventListener("touchend", disableDrawing);
     mouse.isVisible = true;
     colorsBoard.enablePen();
     drawerContainerElement.classList.remove("disabled");
@@ -130,6 +148,8 @@ const Drawer = () => {
   function unregisterEventListener() {
     document.removeEventListener("mousemove", trackCursor);
     document.removeEventListener("mouseup", disableDrawing);
+    document.removeEventListener("touchmove", trackCursor);
+    document.removeEventListener("touchend", disableDrawing);
     cursorListener = null;
     mouse.isVisible = false;
     colorsBoard.disablePen();
